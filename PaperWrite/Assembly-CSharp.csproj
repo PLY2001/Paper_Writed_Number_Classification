@@ -53,9 +53,10 @@
     <UnityVersion>2020.3.19f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\Paper.cs" />
     <Compile Include="Assets\isClick.cs" />
-    <Compile Include="Assets\toSave.cs" />
+    <Compile Include="Assets\Program.cs" />
+    <Compile Include="Assets\Paper.cs" />
+    <Compile Include="Assets\NetWorkPro.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\PaperWrite.shader" />

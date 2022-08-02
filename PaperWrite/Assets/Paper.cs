@@ -2,80 +2,63 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Paper : MonoBehaviour
 {
 
-    //public Texture2D heightMap;     //我们指定的高度图
-
-    [Range(0, 70f)]     //Range作为一个Attribute，可以方便我们在Inspector面板上进行
-                        //拖拽更改变量的值，并对其大小做一个限制
-    public float terrainHeight = 10;
 
     [Range(0, 250)]
-    public int terrainSize = 250;    //我们所生成的地形的长宽
+    public int terrainSize = 250;    //生成纸张的长宽
 
     [Range(50, 3000)]
-    public int pencilWidth = 1000;
+    public int pencilWidth = 1000;  //笔的粗细
 
-    public Material terrainMat;     //赋予所生成地形的材质
+    public Material terrainMat;     //赋予所生成纸张的材质
 
-    public static int toWrite = 1;
-    public Vector3 mousePos;
+    
+    public Vector3 mousePos;    //鼠标屏幕空间坐标
 
-    private static Color[] cList;
-    private List<Vector3> vertexs = new List<Vector3>();
+    public Color[] cList;    //存储所有顶点颜色
+    public List<Vector3> vertexs = new List<Vector3>();//储存所有顶点坐标
         
-    private List<int> tris = new List<int>();
+    private List<int> tris = new List<int>();//储存所有三角形
 
-    private static int[] SavedColorList=new int[784];
+    public Color[] SavedColorList=new Color[784];//储存所有用于识别的颜色
+    public int[] SavedColorCount = new int[784];//储存用于识别的颜色的计数
+    
 
+    public static Paper _Paper;//Paper实例
 
-    //public int grassRowCount = 300;
-    //public int grassCountPerPatch = 5;
-    //public Material grassMat;	//之后会指定给点云的材质
-    //private List<Vector3> verts;
-    //public gameManager Player;
+    //private Vector3[] plaScreenPos;//纸张屏幕坐标
 
+   
 
     void Start()
     {
-        //verts = new List<Vector3>();
-        //FirstGenerateTerrain();      //生成地形
-
-        //GenerateGrassArea(grassRowCount, grassCountPerPatch);
-        
-        
-        GenerateTerrain();
+        _Paper = this;
+        GenerateTerrain();//生成纸张
     }
     void Update()
     {
         mousePos = Input.mousePosition;//鼠标屏幕坐标
-        
-        if (isClick._instance.click > 0)
+       
+        if (isClick._instance.click > 0)//鼠标点击，绘画
             ChangeTerrain();
         
-        if(Input.GetKeyDown(KeyCode.S))
-            SaveColor();
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.C))//点击c清空画布
             ClearColor();
-        //grassMat.SetVector("_PlayerPosition", new Vector4(Player.transform.position.x, Player.transform.position.y, Player.transform.position.z, 1.0f));
     }
 
     
 
     private void GenerateTerrain()
     {
-        //要生成一个平面，我们需要自定义其顶点和网格数据
-        //List<Vector3> vertexs = new List<Vector3>();
-        //List<int> tris = new List<int>();
-
-
         //进行循环，生成一个基本的平面
         for (int i = 0; i < terrainSize; i++)
             for (int j = 0; j < terrainSize; j++)
             {
-                //使用GetPixel读取高度图的灰度，计算所生成点的高度
-                vertexs.Add(new Vector3(i - terrainSize / 2, j - terrainSize / 2, terrainHeight));
+                
+                vertexs.Add(new Vector3(j - terrainSize / 2, terrainSize / 2-i, 0));//从左上一行一行向下生成
 
                 //非坐标轴的顶点
                 if (i == 0 || j == 0)
@@ -112,15 +95,15 @@ public class Paper : MonoBehaviour
 
         plane.AddComponent<MeshCollider>();
 
-        //verts.Clear();
+        //纸张初始化为白色
         for (int j = 0; j < vertexs.Count; j++)
         {
             cList[j] = new Color(1, 1, 1);
+
         }
-            plane.GetComponent<MeshFilter>().sharedMesh.SetColors(cList);
+        plane.GetComponent<MeshFilter>().sharedMesh.SetColors(cList);
 
-
-
+        
 
 
 
@@ -131,12 +114,13 @@ public class Paper : MonoBehaviour
     private void ChangeTerrain()
     {
         
-        GameObject pla = GameObject.Find("Terrain");
+        GameObject pla = GameObject.Find("Terrain");//找到Terrain对象
         for (int j = 0; j < vertexs.Count; j++)
         {
-            Vector3 plaScreenPos = Camera.main.WorldToScreenPoint(vertexs[j]);
+            //计算和鼠标的距离
+            Vector3 plaScreenPos = Camera.main.WorldToScreenPoint(vertexs[j]);//将纸张顶点从世界坐标系转换为屏幕坐标系
             float dis = (plaScreenPos.x - mousePos.x) * (plaScreenPos.x - mousePos.x) + (plaScreenPos.y - mousePos.y) * (plaScreenPos.y - mousePos.y);
-            if (dis < pencilWidth)
+            if (dis < pencilWidth)//在距离内则显示黑色
             {
                 cList[j] = new Color(0, 0, 0);
                 //print(dis);
@@ -146,28 +130,60 @@ public class Paper : MonoBehaviour
         }
 
 
-        pla.GetComponent<MeshFilter>().sharedMesh.SetColors(cList);
+        pla.GetComponent<MeshFilter>().sharedMesh.SetColors(cList);//设置颜色
 
     }
 
 
-    private void SaveColor()
+    /*private void SaveColor()
     {
-        
-        for(int j = 0; j < SavedColorList.Length; j++)
+        float col_edge, row_edge;
+        col_edge = terrainSize / 28.0f;
+        row_edge = terrainSize / 28.0f;
+        int[] Table = new int[vertexs.Count];
+        for (int k = 0; k < vertexs.Count; k++)
         {
-            int i = j * cList.Length / SavedColorList.Length;
-            SavedColorList[j] = (int)cList[i].r;
+            int i = k / terrainSize;
+            int j = k % terrainSize;
+            Table[k] = (int)(28 * ((int)((i + 1) / row_edge + 1) - 1) + ((int)((j + 1) / col_edge + 1)) - 1);
+            SavedColorList[Table[k]] += cList[k];
+            SavedColorCount[Table[k]] += 1;
+            //print(Table[k]);
         }
+        for(int n=0;n<784;n++)
+        {
+            SavedColorList[n] = SavedColorList[n] / SavedColorCount[n];
+        }
+
         print("Saved Succeed");
-    }
+
+        float[,] x = new float[28, 28];
+        for(int i = 0; i < 28; i++)
+        {
+            for (int j = 0; j < 28; j++)
+            {
+                x[i, j] = 1-SavedColorList[i * 28 + j].r;
+            }
+        }
+        numberClassification.Cal_with_Network(x);
+        //print(numberClassification.Get_Num());
+        int[] array = new int[10];
+        array = numberClassification.Get_Num_Array();
+        for (int i = 0; i < 10; i++)
+        {
+            print(array[i]);
+        }
+
+    }*/
 
     private void ClearColor()
     {
         for (int j = 0; j < cList.Length; j++)
         {
-            cList[j] = new Color(1, 1, 1);
+            cList[j] = new Color(1, 1, 1);//颜色全部为白色
         }
+        GameObject plan = GameObject.Find("Terrain");
+        plan.GetComponent<MeshFilter>().sharedMesh.SetColors(cList);//设置颜色
     }
 }
 

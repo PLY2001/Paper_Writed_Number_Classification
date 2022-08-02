@@ -3,19 +3,17 @@ Shader "Unlit/PaperWrite"
 	Properties{
 		_Color("Color Tint", Color) = (1, 1, 1, 1)
 		_MainTex("Main Tex", 2D) = "white" {}
-		_OutlineColor("Outline Color", Color) = (0, 0, 0, 1)
-		_Specular("Specular", Color) = (1, 1, 1, 1)
-		_SpecularScale("Specular Scale", Range(0, 0.1)) = 0.01
+		
 
 
 	}
 		SubShader{
-			Tags { "RenderType" = "Opaque" "Queue" = "Geometry"}
+			Tags { "RenderType" = "Opaque" "Queue" = "Geometry""DisableBatching"="True"}
 
 			Pass {
 				Tags { "LightMode" = "ForwardBase" }
 
-				Cull Back
+				Cull Off
 
 				CGPROGRAM
 
@@ -32,20 +30,17 @@ Shader "Unlit/PaperWrite"
 				fixed4 _Color;
 				sampler2D _MainTex;
 				float4 _MainTex_ST;
-				sampler2D _Ramp;
-				fixed4 _Specular;
-				fixed _SpecularScale;
+				
 
 				struct a2v {
 					float4 vertex : POSITION;
 					float3 normal : NORMAL;
 					float4 texcoord : TEXCOORD0;
-					float4 tangent : TANGENT;
 					fixed4 color : COLOR;
 				};
 
 				struct v2f {
-					float4 pos : POSITION;
+					float4 pos : SV_POSITION;
 					float2 uv : TEXCOORD0;
 					float3 worldNormal : TEXCOORD1;
 					float3 worldPos : TEXCOORD2;
@@ -56,12 +51,13 @@ Shader "Unlit/PaperWrite"
 
 				v2f vert(a2v v) {
 					v2f o;
-
+					
 					o.pos = UnityObjectToClipPos(v.vertex);
 					o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 					o.worldNormal = UnityObjectToWorldNormal(v.normal);
 					o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 					o.toWirte=v.color;
+					
 					TRANSFER_SHADOW(o);
 
 					return o;
@@ -73,7 +69,7 @@ Shader "Unlit/PaperWrite"
 					fixed3 worldViewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
 					fixed3 worldHalfDir = normalize(worldLightDir + worldViewDir);
 
-					fixed3 diffuse=i.toWirte.xyz;
+					fixed3 diffuse=i.toWirte.xyz*_Color;
 					
 
 					
