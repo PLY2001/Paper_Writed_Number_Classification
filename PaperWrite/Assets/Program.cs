@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace SimpleNeuralNetwork
 {
@@ -18,12 +19,12 @@ namespace SimpleNeuralNetwork
 
         public NumberClassification()
         {
-            fc1.Read_Weight("D:\\Unity Project\\PaperWrite\\Assets\\fc1_weight.csv");
-            fc1.Read_Bias("D:\\Unity Project\\PaperWrite\\Assets\\fc1_bias.csv");
-            fc2.Read_Weight("D:\\Unity Project\\PaperWrite\\Assets\\fc2_weight.csv");
-            fc2.Read_Bias("D:\\Unity Project\\PaperWrite\\Assets\\fc2_bias.csv");
-            fc3.Read_Weight("D:\\Unity Project\\PaperWrite\\Assets\\fc3_weight.csv");
-            fc3.Read_Bias("D:\\Unity Project\\PaperWrite\\Assets\\fc3_bias.csv");            
+            fc1.Read_Weight(Application.streamingAssetsPath+"/fc1_weight.csv");
+            fc1.Read_Bias(Application.streamingAssetsPath + "/fc1_bias.csv");
+            fc2.Read_Weight(Application.streamingAssetsPath + "/fc2_weight.csv");
+            fc2.Read_Bias(Application.streamingAssetsPath + "/fc2_bias.csv");
+            fc3.Read_Weight(Application.streamingAssetsPath + "/fc3_weight.csv");
+            fc3.Read_Bias(Application.streamingAssetsPath + "/fc3_bias.csv");            
         }
 
         public void Cal_with_Network(float[,] image)
@@ -134,7 +135,7 @@ namespace SimpleNeuralNetwork
         {
             input_Num = input_Number;
             output_Num = output_Number;
-            Random r = new Random();
+            System.Random r = new System.Random();
             for (int i = 0; i < output_Num; i++)
             {
                 for (int j = 0; j < input_Num; j++)

@@ -57,6 +57,7 @@
     <Compile Include="Assets\Program.cs" />
     <Compile Include="Assets\Paper.cs" />
     <Compile Include="Assets\NetWorkPro.cs" />
+    <Compile Include="Assets\Change.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\PaperWrite.shader" />

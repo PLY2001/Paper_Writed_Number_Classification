@@ -14,11 +14,12 @@ public class NetWorkPro : MonoBehaviour
     static int indexBottom;
     static int indexLeft;
     static int indexRight;
+    public float Value;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        Value = 50;
     }
 
     // Update is called once per frame
@@ -188,17 +189,38 @@ public class NetWorkPro : MonoBehaviour
 
         //显示文字
         GameObject texter = GameObject.Find("Text");
-        texter.GetComponent<Text>().text="猜测为\n"+array[0].ToString()+"\t"+array1[0].ToString()+"%";
         GameObject texter1 = GameObject.Find("Text1");
-        texter1.GetComponent<Text>().text = "备选\n" + array[1] + "\t" + array1[1]+"%"+
-        "\n" + array[2] + "\t" + array1[2] + "%" +
-        "\n" + array[3] + "\t" + array1[3] + "%" +
-        "\n" + array[4] + "\t" + array1[4] + "%" +
-        "\n" + array[5] + "\t" + array1[5] + "%" +
-        "\n" + array[6] + "\t" + array1[6] + "%" +
-        "\n" + array[7] + "\t" + array1[7] + "%" +
-        "\n" + array[8] + "\t" + array1[8] + "%" +
-        "\n" + array[9] + "\t" + array1[9] + "%";
+        if (array1[0]>Value)
+        {
+            texter.GetComponent<Text>().text = "猜测为\n" + array[0].ToString() + "\t" + array1[0].ToString() + "%";
+            
+            texter1.GetComponent<Text>().text = "备选\n" + array[1] + "\t" + array1[1] + "%" +
+            "\n" + array[2] + "\t" + array1[2] + "%" +
+            "\n" + array[3] + "\t" + array1[3] + "%" +
+            "\n" + array[4] + "\t" + array1[4] + "%" +
+            "\n" + array[5] + "\t" + array1[5] + "%" +
+            "\n" + array[6] + "\t" + array1[6] + "%" +
+            "\n" + array[7] + "\t" + array1[7] + "%" +
+            "\n" + array[8] + "\t" + array1[8] + "%" +
+            "\n" + array[9] + "\t" + array1[9] + "%";
+        }
+        else
+        {
+            texter.GetComponent<Text>().text = "不确定";
+
+            texter1.GetComponent<Text>().text = "备选\n" +
+                   array[0] + "\t" + array1[0] + "%" +
+            "\n" + array[1] + "\t" + array1[1] + "%" +
+            "\n" + array[2] + "\t" + array1[2] + "%" +
+            "\n" + array[3] + "\t" + array1[3] + "%" +
+            "\n" + array[4] + "\t" + array1[4] + "%" +
+            "\n" + array[5] + "\t" + array1[5] + "%" +
+            "\n" + array[6] + "\t" + array1[6] + "%" +
+            "\n" + array[7] + "\t" + array1[7] + "%" +
+            "\n" + array[8] + "\t" + array1[8] + "%" +
+            "\n" + array[9] + "\t" + array1[9] + "%";
+        }
+        
 
         //print(array[0]);
      
