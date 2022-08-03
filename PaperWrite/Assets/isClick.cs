@@ -17,16 +17,20 @@ public class isClick : MonoBehaviour
     {
         
     }
-    private void OnMouseDown()
-    {
-        click = 1;
+    //private void OnMouseDown()
+    //{
+        
 
-    }
+    //}
 
     private void OnMouseUp()
     {
         click = 0;
 
+    }
+    private void OnMouseDrag()
+    {
+        click = 1;
     }
 }
 

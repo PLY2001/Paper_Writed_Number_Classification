@@ -7,6 +7,14 @@ using UnityEngine.UI;
 public class NetWorkPro : MonoBehaviour
 {
     NumberClassification numberClassification = new NumberClassification();
+    public float[,] cList2dT2B = new float[250,250];
+    public float[,] cList2dL2R = new float[250, 250];
+    public float[,] CaughtcList;
+    static int indexTop;
+    static int indexBottom;
+    static int indexLeft;
+    static int indexRight;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,10 +29,7 @@ public class NetWorkPro : MonoBehaviour
 
     public void SaveColor()//传输用于识别的颜色，因为识别时的颜色分辨率为28*28，需平均化
     {
-        float col_edge, row_edge;
-        col_edge = Paper._Paper.terrainSize / 28.0f;
-        row_edge = Paper._Paper.terrainSize / 28.0f;
-        int[] Table = new int[Paper._Paper.vertexs.Count];
+        
 
         for (int n = 0; n < 784; n++)
         {
@@ -32,7 +37,98 @@ public class NetWorkPro : MonoBehaviour
             
         }
 
-        for (int k = 0; k < Paper._Paper.vertexs.Count; k++)
+        indexTop = 0;
+        indexBottom = 249;
+        indexLeft = 0;
+        indexRight = 249;
+        int firstCaughtT= 1;
+        int firstCaughtL = 1;
+        for (int i=0;i< 250;i++)
+        {
+            for(int j=0;j<250;j++)
+            {
+                cList2dT2B[i, j] = Paper._Paper.cList[i * 250 + j].r;
+                cList2dL2R[j, i] = Paper._Paper.cList[j * 250 + i].r;
+                if (cList2dT2B[i,j]<1)
+                {
+                    if(firstCaughtT>0)
+                    {
+                        indexTop = i;//行
+                        firstCaughtT = 0;
+                    }
+                    indexBottom = i;  
+                }
+                if (cList2dL2R[j, i] < 1)
+                {
+                    if (firstCaughtL > 0)
+                    {
+                        indexLeft = i;//列
+                        firstCaughtL = 0;
+                    }
+                    indexRight = i;
+                }
+            }
+        }
+
+        int CaughtHeight = indexBottom - indexTop+1;
+        int CaughtWidth = indexRight - indexLeft+1;
+
+        //print(CaughtHeight);
+        //print(CaughtWidth);
+
+        if(CaughtHeight>CaughtWidth)
+        {
+            CaughtcList = new float[CaughtHeight,CaughtHeight];
+            
+            for(int i=0;i<CaughtHeight;i++)
+            {
+                for (int j = 0; j < CaughtHeight;j++)
+                {
+                    CaughtcList[i, j] = 1;
+
+                    if (CaughtHeight - 2 * j - CaughtWidth <= 0 && CaughtWidth + CaughtHeight - j * 2 >= 0)
+                    {
+                        int gg = indexLeft + (j - (CaughtHeight - CaughtWidth) / 2);
+                        if (gg>249)
+                        {
+                            gg = 249;
+
+                        }
+                        CaughtcList[i, j] = cList2dT2B[indexTop + i, gg];
+                    }
+                }
+
+                
+            }
+        }
+        else
+        {
+            CaughtcList = new float[CaughtWidth, CaughtWidth];
+
+            for (int i = 0; i < CaughtWidth; i++)
+            {
+                for (int j = 0; j < CaughtWidth; j++)
+                {
+                    CaughtcList[i, j] = 1;
+
+                    if (CaughtWidth - 2 * i - CaughtHeight <= 0 && CaughtWidth + CaughtHeight - i * 2 >= 0)
+                    {
+                        int ggg = indexTop + (i - (CaughtWidth - CaughtHeight) / 2);
+                        if (ggg > 249)
+                        {
+                            ggg = 249;
+
+                        }
+                        CaughtcList[i, j] = cList2dT2B[ggg, indexLeft + j];
+                    }
+                }
+
+
+            }
+        }
+
+
+        /*for (int k = 0; k < Paper._Paper.vertexs.Count; k++)
         {
             int i = k / Paper._Paper.terrainSize;
             int j = k % Paper._Paper.terrainSize;
@@ -41,7 +137,30 @@ public class NetWorkPro : MonoBehaviour
             Paper._Paper.SavedColorList[Table[k]] += Paper._Paper.cList[k];//存颜色
             Paper._Paper.SavedColorCount[Table[k]] += 1;//计数，准备平均化
             //print(Table[k]);
+        }*/
+        int size = CaughtcList.GetLength(0) * CaughtcList.GetLength(1);//0高1宽
+        float col_edge, row_edge;
+        col_edge = CaughtcList.GetLength(1) / 28.0f;
+        row_edge = CaughtcList.GetLength(0) / 28.0f;
+        int[] Table = new int[size];
+        for (int k = 0; k < size; k++)
+        {
+            int i = k / CaughtcList.GetLength(1);
+            int j = k % CaughtcList.GetLength(1);
+            //得到第k个顶点的方块索引
+            Table[k] = (int)(28 * ((int)((i + 1) / row_edge + 1) - 1) + ((int)((j + 1) / col_edge + 1)) - 1);
+            //print(Table[k]);
+            if(Table[k]>783)
+            {
+                Table[k] = 783;
+            }
+            Paper._Paper.SavedColorList[Table[k]] += new Color(CaughtcList[i,j],1,1);//存颜色
+            Paper._Paper.SavedColorCount[Table[k]] += 1;//计数，准备平均化
+            //print(Table[k]);
+            //print(CaughtcList.GetLength(1));
+            //print(CaughtcList.GetLength(0));
         }
+
         for (int n = 0; n < 784; n++)
         {
             //平均化

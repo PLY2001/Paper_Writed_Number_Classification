@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public class Paper : MonoBehaviour
@@ -17,9 +18,10 @@ public class Paper : MonoBehaviour
 
     
     public Vector3 mousePos;    //鼠标屏幕空间坐标
+    public Vector3 lastMousePos;//鼠标上一个位置屏幕空间坐标
 
     public Color[] cList;    //存储所有顶点颜色
-    public List<Vector3> vertexs = new List<Vector3>();//储存所有顶点坐标
+    public List<Vector3> vertexs = new List<Vector3>();//储存所有顶点坐标,下方还有第二种定义数组的方式
         
     private List<int> tris = new List<int>();//储存所有三角形
 
@@ -29,24 +31,37 @@ public class Paper : MonoBehaviour
 
     public static Paper _Paper;//Paper实例
 
-    //private Vector3[] plaScreenPos;//纸张屏幕坐标
+    private List<Vector3> plaScreenPos=new List<Vector3>();//纸张屏幕坐标
 
-   
+    public int donot = 1;//1表示不要与上一个鼠标位置连起来
 
     void Start()
     {
         _Paper = this;
         GenerateTerrain();//生成纸张
+        donot = 1;
+        mousePos = new Vector3(0, 0, 0);
+        lastMousePos = new Vector3(0, 0, 0);
+        GameObject slider = GameObject.Find("Slider");
+        slider.GetComponent<Slider>().value = pencilWidth;
     }
     void Update()
     {
+
+        
+        
         mousePos = Input.mousePosition;//鼠标屏幕坐标
-       
+        
         if (isClick._instance.click > 0)//鼠标点击，绘画
             ChangeTerrain();
+
+        if (isClick._instance.click < 1)//鼠标抬起，则下一次绘画不会与抬起处插值
+            donot = 1;
         
         if (Input.GetKeyDown(KeyCode.C))//点击c清空画布
             ClearColor();
+        
+        lastMousePos = mousePos;
     }
 
     
@@ -99,6 +114,8 @@ public class Paper : MonoBehaviour
         for (int j = 0; j < vertexs.Count; j++)
         {
             cList[j] = new Color(1, 1, 1);
+            plaScreenPos.Add(Camera.main.WorldToScreenPoint(vertexs[j]));//将纸张顶点从世界坐标系转换为屏幕坐标系
+
 
         }
         plane.GetComponent<MeshFilter>().sharedMesh.SetColors(cList);
@@ -115,16 +132,62 @@ public class Paper : MonoBehaviour
     {
         
         GameObject pla = GameObject.Find("Terrain");//找到Terrain对象
+        //float a = 1 / (mousePos.x - lastMousePos.x);
+        //float b = -1 / (mousePos.x - lastMousePos.x);
+        //float c = lastMousePos.y / (mousePos.y - lastMousePos.y) - lastMousePos.x / (mousePos.x - lastMousePos.x);
+        Vector3 mP1 = (lastMousePos + mousePos) / 2;
+        
+        Vector3 mP2 = (lastMousePos + mP1) / 2;
+        Vector3 mP3 = (mousePos + mP1) / 2;
+        Vector3 mP4 = (lastMousePos + mP2) / 2;
+        Vector3 mP5 = (mP2 + mP1) / 2;
+        Vector3 mP6 = (mP1 + mP3) / 2;
+        Vector3 mP7 = (mP3 + mousePos) / 2;
+
+        GameObject slider = GameObject.Find("Slider");
+        pencilWidth=(int)slider.GetComponent<Slider>().value;
+
+
         for (int j = 0; j < vertexs.Count; j++)
         {
             //计算和鼠标的距离
-            Vector3 plaScreenPos = Camera.main.WorldToScreenPoint(vertexs[j]);//将纸张顶点从世界坐标系转换为屏幕坐标系
-            float dis = (plaScreenPos.x - mousePos.x) * (plaScreenPos.x - mousePos.x) + (plaScreenPos.y - mousePos.y) * (plaScreenPos.y - mousePos.y);
-            if (dis < pencilWidth)//在距离内则显示黑色
+            //float dis = (plaScreenPos[j].x - mousePos.x) * (plaScreenPos[j].x - mousePos.x) + (plaScreenPos[j].y - mousePos.y) * (plaScreenPos[j].y - mousePos.y);
+            float dis1 = dis(mousePos, plaScreenPos[j]);
+            //float dis2 = dis(lastMousePos, plaScreenPos[j]);
+            if(donot<1)
             {
-                cList[j] = new Color(0, 0, 0);
-                //print(dis);
+                float dis3 = dis(mP1, plaScreenPos[j]);
+                float dis4 = dis(mP2, plaScreenPos[j]);
+                float dis5 = dis(mP3, plaScreenPos[j]);
+                float dis6 = dis(mP4, plaScreenPos[j]);
+                float dis7 = dis(mP5, plaScreenPos[j]);
+                float dis8 = dis(mP6, plaScreenPos[j]);
+                float dis9 = dis(mP7, plaScreenPos[j]);
+                if (dis1 < pencilWidth || dis3 < pencilWidth || dis4 < pencilWidth || dis5 < pencilWidth || dis6 < pencilWidth || dis7 < pencilWidth || dis8 < pencilWidth || dis9 < pencilWidth)//在距离内则显示黑色
+                {
+                    cList[j] = new Color(0, 0, 0);
+                    //print(dis);
+                }
             }
+            else
+            {
+                if (dis1 < pencilWidth)//在距离内则显示黑色
+                {
+                    cList[j] = new Color(0, 0, 0);
+                    //print(dis);
+                }
+                
+            }
+            if (donot > 0)
+                donot = 0;
+            
+
+            //float lastDis = (plaScreenPos[j].x - lastMousePos.x) * (plaScreenPos[j].x - lastMousePos.x) + (plaScreenPos[j].y - lastMousePos.y) * (plaScreenPos[j].y - lastMousePos.y);
+            //double dis = abs(a * plaScreenPos[j].x + b * plaScreenPos[j].y + c) / (a * a + b * b);
+            //float dis10 = dis1 + dis2 + dis3 + dis4 + dis5 + dis6 + dis7 + dis8 + dis9;
+            
+            
+
             
 
         }
@@ -135,47 +198,6 @@ public class Paper : MonoBehaviour
     }
 
 
-    /*private void SaveColor()
-    {
-        float col_edge, row_edge;
-        col_edge = terrainSize / 28.0f;
-        row_edge = terrainSize / 28.0f;
-        int[] Table = new int[vertexs.Count];
-        for (int k = 0; k < vertexs.Count; k++)
-        {
-            int i = k / terrainSize;
-            int j = k % terrainSize;
-            Table[k] = (int)(28 * ((int)((i + 1) / row_edge + 1) - 1) + ((int)((j + 1) / col_edge + 1)) - 1);
-            SavedColorList[Table[k]] += cList[k];
-            SavedColorCount[Table[k]] += 1;
-            //print(Table[k]);
-        }
-        for(int n=0;n<784;n++)
-        {
-            SavedColorList[n] = SavedColorList[n] / SavedColorCount[n];
-        }
-
-        print("Saved Succeed");
-
-        float[,] x = new float[28, 28];
-        for(int i = 0; i < 28; i++)
-        {
-            for (int j = 0; j < 28; j++)
-            {
-                x[i, j] = 1-SavedColorList[i * 28 + j].r;
-            }
-        }
-        numberClassification.Cal_with_Network(x);
-        //print(numberClassification.Get_Num());
-        int[] array = new int[10];
-        array = numberClassification.Get_Num_Array();
-        for (int i = 0; i < 10; i++)
-        {
-            print(array[i]);
-        }
-
-    }*/
-
     private void ClearColor()
     {
         for (int j = 0; j < cList.Length; j++)
@@ -184,6 +206,15 @@ public class Paper : MonoBehaviour
         }
         GameObject plan = GameObject.Find("Terrain");
         plan.GetComponent<MeshFilter>().sharedMesh.SetColors(cList);//设置颜色
+    }
+
+    
+
+    private float dis(Vector3 mouse,Vector3 pla)
+    {
+        float dis1 = (pla.x - mouse.x) * (pla.x - mouse.x) + (pla.y - mouse.y) * (pla.y - mouse.y);
+
+        return dis1;
     }
 }
 

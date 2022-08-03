@@ -57,13 +57,13 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 2326}
     - Class: 114
-      Script: {instanceID: 2478}
+      Script: {instanceID: 2476}
     - Class: 114
-      Script: {instanceID: 2658}
+      Script: {instanceID: 2656}
     - Class: 114
-      Script: {instanceID: 3318}
+      Script: {instanceID: 3316}
     - Class: 114
-      Script: {instanceID: 3752}
+      Script: {instanceID: 3750}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -405,7 +405,7 @@ ScriptsOnlyBuild:
     className: ActivationTrack
   - hash:
       serializedVersion: 2
-      Hash: abc19791e0445dfd11da6dbbe9202bf4
+      Hash: aeb7df3cc013833271296344e83bc253
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Paper
@@ -520,4 +520,4 @@ ScriptsOnlyBuild:
   platform: 19
   scenePathNames:
   - Assets/Scenes/SampleScene.unity
-  playerPath: D:/Files/Paper_Writed_Number_Classification/PaperWrite.exe
+  playerPath: D:/Files/Paper_Writed_Number_Classification_V1.1/PaperWrite.exe
