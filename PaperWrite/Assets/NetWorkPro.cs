@@ -15,6 +15,7 @@ public class NetWorkPro : MonoBehaviour
     static int indexLeft;
     static int indexRight;
     public float Value;
+    static int toSave = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -25,6 +26,21 @@ public class NetWorkPro : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
+        if(isClick._instance.click<1)
+        {
+            if(toSave>0)
+            {
+                
+                toSave = 0;
+
+            }
+            
+
+        }
+        if(isClick._instance.click >0)
+        {
+            toSave = 1;
+        }
         SaveColor();
     }
 
