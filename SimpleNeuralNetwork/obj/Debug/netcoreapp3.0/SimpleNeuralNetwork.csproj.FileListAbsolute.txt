@@ -1,0 +1,11 @@
+D:\文件\C#\SimpleNeuralNetwork\bin\Debug\netcoreapp3.0\SimpleNeuralNetwork.exe
+D:\文件\C#\SimpleNeuralNetwork\bin\Debug\netcoreapp3.0\SimpleNeuralNetwork.deps.json
+D:\文件\C#\SimpleNeuralNetwork\bin\Debug\netcoreapp3.0\SimpleNeuralNetwork.runtimeconfig.json
+D:\文件\C#\SimpleNeuralNetwork\bin\Debug\netcoreapp3.0\SimpleNeuralNetwork.runtimeconfig.dev.json
+D:\文件\C#\SimpleNeuralNetwork\bin\Debug\netcoreapp3.0\SimpleNeuralNetwork.dll
+D:\文件\C#\SimpleNeuralNetwork\bin\Debug\netcoreapp3.0\SimpleNeuralNetwork.pdb
+D:\文件\C#\SimpleNeuralNetwork\obj\Debug\netcoreapp3.0\SimpleNeuralNetwork.csprojAssemblyReference.cache
+D:\文件\C#\SimpleNeuralNetwork\obj\Debug\netcoreapp3.0\SimpleNeuralNetwork.AssemblyInfoInputs.cache
+D:\文件\C#\SimpleNeuralNetwork\obj\Debug\netcoreapp3.0\SimpleNeuralNetwork.AssemblyInfo.cs
+D:\文件\C#\SimpleNeuralNetwork\obj\Debug\netcoreapp3.0\SimpleNeuralNetwork.dll
+D:\文件\C#\SimpleNeuralNetwork\obj\Debug\netcoreapp3.0\SimpleNeuralNetwork.pdb
